@@ -177,6 +177,49 @@ Random Forest achieved the highest recall (**62.30%**), which can be useful when
 
 However, considering the overall performance and ROC-AUC, XGBoost was selected for the final application.
 
+
+## 🎯 Classification Threshold Analysis
+
+The default classification threshold of 0.50 was further evaluated to understand the trade-off between precision and recall.
+
+| Threshold | Precision |    Recall |  F1-score |
+| --------- | --------: | --------: | --------: |
+| 0.30      |     53.3% | **76.5%** | **62.8%** |
+| 0.40      |     58.7% |     65.0% |     61.7% |
+| 0.50      |     67.5% |     52.1% |     58.8% |
+| 0.60      |     72.4% |     38.0% |     49.8% |
+| 0.70      | **80.6%** |     26.7% |     40.2% |
+
+A threshold of **0.30** provides substantially higher recall and the highest F1-score among the evaluated thresholds. This can be useful when the business prioritizes identifying more potential churners.
+
+The final threshold can therefore be adjusted according to the business objective and the relative cost of false positives versus false negatives.
+
+---
+
+## 🔍 Feature Importance
+
+The XGBoost model was used to identify the features that contributed most strongly to its predictions.
+
+The most influential encoded features were:
+
+| Rank | Feature                 | Importance |
+| ---- | ----------------------- | ---------: |
+| 1    | Month-to-month contract |      0.371 |
+| 2    | Fiber optic internet    |      0.096 |
+| 3    | No online security      |      0.083 |
+| 4    | No tech support         |      0.041 |
+| 5    | Two-year contract       |      0.033 |
+| 6    | DSL internet            |      0.026 |
+| 7    | Tenure                  |      0.022 |
+| 8    | Electronic check        |      0.019 |
+
+The results indicate that **contract type, internet service, online security, technical support, and customer tenure** are among the important factors influencing the model's churn predictions.
+
+The high importance of month-to-month contracts is also consistent with the EDA, where this customer segment had a much higher observed churn rate than customers with one-year or two-year contracts.
+
+> Note: Feature importance indicates how much a feature contributes to the trained model's predictions. It does not by itself establish a causal relationship between the feature and customer churn.
+
+
 ### XGBoost Configuration
 
 ```python
