@@ -8,7 +8,7 @@ Customer churn is a major challenge for subscription-based businesses. Identifyi
 
 In this project, customer data is analyzed using Exploratory Data Analysis (EDA), preprocessed using Scikit-learn, and multiple machine learning models are compared to predict customer churn.
 
-The final model is deployed through a Streamlit web application for interactive predictions.
+The final XGBoost model is deployed through a Streamlit web application for interactive predictions.
 
 ---
 
@@ -20,7 +20,7 @@ The final model is deployed through a Streamlit web application for interactive 
 * Compare multiple machine learning classification models.
 * Evaluate models using Accuracy, Precision, Recall, F1-score, and ROC-AUC.
 * Select the best-performing model.
-* Build an interactive Streamlit application for churn prediction.
+* Build and deploy an interactive Streamlit application for churn prediction.
 
 ---
 
@@ -131,9 +131,9 @@ The dataset was divided into training and testing sets using an **80:20 split** 
 
 ### Numerical Features
 
-* tenure
-* MonthlyCharges
-* TotalCharges
+* `tenure`
+* `MonthlyCharges`
+* `TotalCharges`
 
 Numerical features were standardized using `StandardScaler`.
 
@@ -177,6 +177,21 @@ Random Forest achieved the highest recall (**62.30%**), which can be useful when
 
 However, considering the overall performance and ROC-AUC, XGBoost was selected for the final application.
 
+### XGBoost Configuration
+
+```python
+XGBClassifier(
+    n_estimators=200,
+    max_depth=4,
+    learning_rate=0.05,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    random_state=42,
+    eval_metric="logloss"
+)
+```
+
+---
 
 ## 🎯 Classification Threshold Analysis
 
@@ -192,7 +207,9 @@ The default classification threshold of 0.50 was further evaluated to understand
 
 A threshold of **0.30** provides substantially higher recall and the highest F1-score among the evaluated thresholds. This can be useful when the business prioritizes identifying more potential churners.
 
-The final threshold can therefore be adjusted according to the business objective and the relative cost of false positives versus false negatives.
+The classification threshold can therefore be adjusted according to the business objective and the relative cost of false positives versus false negatives.
+
+> **Note:** The deployed Streamlit application currently uses the default 0.50 classification threshold. The threshold analysis is included to demonstrate how model behavior can be adjusted according to business requirements.
 
 ---
 
@@ -219,21 +236,6 @@ The high importance of month-to-month contracts is also consistent with the EDA,
 
 > Note: Feature importance indicates how much a feature contributes to the trained model's predictions. It does not by itself establish a causal relationship between the feature and customer churn.
 
-
-### XGBoost Configuration
-
-```python
-XGBClassifier(
-    n_estimators=200,
-    max_depth=4,
-    learning_rate=0.05,
-    subsample=0.8,
-    colsample_bytree=0.8,
-    random_state=42,
-    eval_metric="logloss"
-)
-```
-
 ---
 
 ## 📈 XGBoost Confusion Matrix
@@ -244,8 +246,8 @@ The model produced the following results on the test set:
                  Predicted
                  No     Yes
 
-Actual No       941     94
-Actual Yes      179    195
+Actual No        941     94
+Actual Yes       179    195
 ```
 
 Therefore:
@@ -263,13 +265,19 @@ An interactive Streamlit application was developed where users can enter custome
 
 * Churn prediction
 * Churn probability
+* Prediction interpretation
 
 Example output:
 
 ```text
 Customer is NOT likely to churn
+
 Churn Probability: 21.81%
 ```
+
+### 🚀 Live Demo
+
+**[Open Customer Churn Prediction App](https://customer-churn-prediction-fcptqgjn6agpdqeuafxt9m.streamlit.app/)**
 
 ---
 
@@ -390,12 +398,12 @@ Businesses can use these insights to design targeted retention strategies such a
 ## 🔮 Future Improvements
 
 * Hyperparameter tuning using GridSearchCV or RandomizedSearchCV.
-* Threshold optimization to improve churn recall.
 * Precision-Recall curve analysis.
 * Cross-validation for more robust model evaluation.
 * SHAP-based model explainability.
 * Customer-level retention recommendations.
-* Cloud deployment of the Streamlit application.
+* Cost-sensitive learning based on business requirements.
+* Automated monitoring of model performance after deployment.
 
 ---
 
@@ -414,5 +422,8 @@ NIT Durgapur
 * Real-world customer churn prediction problem.
 * Comparison of three classification algorithms.
 * XGBoost-based final model.
+* Classification threshold analysis.
+* Feature importance analysis.
 * Interactive Streamlit application.
+* Live cloud deployment.
 * Data-driven business insights.
