@@ -277,7 +277,7 @@ Churn Probability: 21.81%
 
 ### 🚀 Live Demo
 
-**[Open Customer Churn Prediction App](https://customer-churn-prediction-fcptqgjn6agpdqeuafxt9m.streamlit.app/)**
+[Open Customer Churn Prediction App](https://customer-churn-prediction-fcptqgjn6agpdqeuafxt9m.streamlit.app/)
 
 ---
 
