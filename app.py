@@ -2,99 +2,186 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# Load trained model and preprocessor
+# --------------------------------------------------
+# Load Model and Preprocessor
+# --------------------------------------------------
+
 model = joblib.load("models/xgb_churn_model.pkl")
 preprocessor = joblib.load("models/preprocessor.pkl")
 
-# Page configuration
+
+# --------------------------------------------------
+# Page Configuration
+# --------------------------------------------------
+
 st.set_page_config(
     page_title="Customer Churn Prediction",
     page_icon="📊",
     layout="wide"
 )
 
+
+# --------------------------------------------------
+# Header
+# --------------------------------------------------
+
 st.title("📊 Customer Churn Prediction")
-st.write("Enter customer details to predict whether the customer is likely to churn.")
+st.markdown(
+    "Predict whether a telecom customer is likely to churn "
+    "based on their demographics, services, contract and billing information."
+)
 
 st.divider()
 
-# Customer information
-col1, col2 = st.columns(2)
+
+# --------------------------------------------------
+# Customer Information
+# --------------------------------------------------
+
+st.subheader("👤 Customer Information")
+
+col1, col2, col3 = st.columns(3)
 
 with col1:
     gender = st.selectbox("Gender", ["Female", "Male"])
-    senior_citizen = st.selectbox("Senior Citizen", [0, 1])
+
+    senior_citizen = st.selectbox(
+        "Senior Citizen",
+        [0, 1],
+        format_func=lambda x: "Yes" if x == 1 else "No"
+    )
+
     partner = st.selectbox("Partner", ["Yes", "No"])
+
     dependents = st.selectbox("Dependents", ["Yes", "No"])
-    tenure = st.number_input("Tenure (months)", min_value=0, max_value=72, value=12)
-    phone_service = st.selectbox("Phone Service", ["Yes", "No"])
+
+    tenure = st.number_input(
+        "Tenure (months)",
+        min_value=0,
+        max_value=72,
+        value=12
+    )
+
+with col2:
+    phone_service = st.selectbox(
+        "Phone Service",
+        ["Yes", "No"]
+    )
+
     multiple_lines = st.selectbox(
         "Multiple Lines",
         ["Yes", "No", "No phone service"]
     )
+
     internet_service = st.selectbox(
         "Internet Service",
         ["DSL", "Fiber optic", "No"]
     )
 
-with col2:
     online_security = st.selectbox(
         "Online Security",
         ["Yes", "No", "No internet service"]
     )
+
     online_backup = st.selectbox(
         "Online Backup",
         ["Yes", "No", "No internet service"]
     )
+
+with col3:
     device_protection = st.selectbox(
         "Device Protection",
         ["Yes", "No", "No internet service"]
     )
+
     tech_support = st.selectbox(
         "Tech Support",
         ["Yes", "No", "No internet service"]
     )
+
     streaming_tv = st.selectbox(
         "Streaming TV",
         ["Yes", "No", "No internet service"]
     )
+
     streaming_movies = st.selectbox(
         "Streaming Movies",
         ["Yes", "No", "No internet service"]
     )
+
+
+st.divider()
+
+
+# --------------------------------------------------
+# Contract and Billing
+# --------------------------------------------------
+
+st.subheader("💳 Contract & Billing")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
     contract = st.selectbox(
         "Contract",
         ["Month-to-month", "One year", "Two year"]
     )
+
+with col2:
     paperless_billing = st.selectbox(
         "Paperless Billing",
         ["Yes", "No"]
     )
 
-payment_method = st.selectbox(
-    "Payment Method",
-    [
-        "Electronic check",
-        "Mailed check",
-        "Bank transfer (automatic)",
-        "Credit card (automatic)"
-    ]
+with col3:
+    payment_method = st.selectbox(
+        "Payment Method",
+        [
+            "Electronic check",
+            "Mailed check",
+            "Bank transfer (automatic)",
+            "Credit card (automatic)"
+        ]
+    )
+
+
+col1, col2 = st.columns(2)
+
+with col1:
+    monthly_charges = st.number_input(
+        "Monthly Charges",
+        min_value=0.0,
+        value=70.0,
+        step=1.0
+    )
+
+with col2:
+    total_charges = st.number_input(
+        "Total Charges",
+        min_value=0.0,
+        value=840.0,
+        step=10.0
+    )
+
+
+st.divider()
+
+
+# --------------------------------------------------
+# Prediction Button
+# --------------------------------------------------
+
+predict_button = st.button(
+    "🔮 Predict Customer Churn",
+    use_container_width=True
 )
 
-monthly_charges = st.number_input(
-    "Monthly Charges",
-    min_value=0.0,
-    value=70.0
-)
 
-total_charges = st.number_input(
-    "Total Charges",
-    min_value=0.0,
-    value=840.0
-)
-
+# --------------------------------------------------
 # Prediction
-if st.button("🔮 Predict Churn", use_container_width=True):
+# --------------------------------------------------
+
+if predict_button:
 
     input_data = pd.DataFrame({
         "gender": [gender],
@@ -121,15 +208,50 @@ if st.button("🔮 Predict Churn", use_container_width=True):
     # Apply preprocessing
     input_processed = preprocessor.transform(input_data)
 
-    # Prediction
+    # Make prediction
     prediction = model.predict(input_processed)[0]
     probability = model.predict_proba(input_processed)[0][1]
 
     st.divider()
+    st.subheader("📈 Prediction Result")
 
+    result_col1, result_col2 = st.columns(2)
+
+    with result_col1:
+
+        if prediction == 1:
+            st.error("⚠️ Customer is likely to CHURN")
+        else:
+            st.success("✅ Customer is NOT likely to CHURN")
+
+    with result_col2:
+        st.metric(
+            "Churn Probability",
+            f"{probability:.2%}"
+        )
+
+    st.progress(float(probability))
+
+    # Interpretation
     if prediction == 1:
-        st.error("⚠️ Customer is likely to CHURN")
+        st.warning(
+            "This customer shows a higher likelihood of leaving the service. "
+            "The business may consider targeted retention strategies."
+        )
     else:
-        st.success("✅ Customer is NOT likely to churn")
+        st.info(
+            "This customer currently shows a lower likelihood of churn "
+            "based on the information provided."
+        )
 
-    st.write(f"**Churn Probability:** {probability:.2%}")
+
+# --------------------------------------------------
+# Footer
+# --------------------------------------------------
+
+st.divider()
+
+st.caption(
+    "Customer Churn Prediction | Machine Learning Project | "
+    "Python • Scikit-learn • XGBoost • Streamlit"
+)
